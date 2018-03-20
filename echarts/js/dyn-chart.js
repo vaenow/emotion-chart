@@ -31,22 +31,25 @@ function formateDate(date) {
 
 }
 
+var colors = ['#5793f3', '#d14a61', '#675bba'];
 option = {
+  color: colors,
+
   title: {
-    text: 'BTC市场情绪指数 （每小时刷新）'
+    text: 'BTC市场情绪指数 （每分钟刷新）'
   },
   tooltip: {
     trigger: 'axis',
     formatter: function (sd, date, c) {
       // console.log(sd,date,c)
-      sd.splice(1, 0, {});
+      // sd.splice(1, 0, {});
       return [
         `时间：${formateDate(new Date(sd[0].value[0]))}`,
-        `${sd[0].marker} ${sd[0].seriesName}：${(sd[0].value[1] / Math.pow(10, 12) * 100).toFixed(2)}%`,
+        `${sd[0].marker} ${sd[0].seriesName}：${(sd[0].value[1] * 100).toFixed(2)}%`,
         // `${sd[1].marker} ${sd[1].seriesName}：${(sd[1].value[1] * 100).toFixed(2)}%`,
-        `${sd[2].marker} ${sd[2].seriesName}：$${sd[2].value[1]}`,
-        `${sd[3].marker} ${sd[3].seriesName}：$${sd[3].value[1]}`,
-        `${sd[4].marker} ${sd[4].seriesName}：$${sd[4].value[1] / Math.pow(10, 7)}`
+        // `${sd[2].marker} ${sd[2].seriesName}：$${sd[2].value[1]}`,
+        // `${sd[3].marker} ${sd[3].seriesName}：$${sd[3].value[1]}`,
+        `${sd[1].marker} ${sd[1].seriesName}：$${sd[1].value[1]}`
       ].join('<br/>')
     },
     axisPointer: {
@@ -59,19 +62,46 @@ option = {
       show: false
     }
   },
-  yAxis: {
+  // yAxis: {
+  //   type: 'value',
+  //   boundaryGap: [0, '100%'],
+  //   splitLine: {
+  //     show: false
+  //   }
+  // },
+  yAxis: [{
     type: 'value',
+    name: '价格指数',
     boundaryGap: [0, '100%'],
+    axisLine: {
+      lineStyle: {
+        // color: colors[0]
+      }
+    },
     splitLine: {
       show: false
+    },
+    axisLabel: {
+      formatter: '${value}'
     }
-  },
-  // {
-  //     name: '百分比',
-  //     nameLocation: 'start',
-  //     max: 1,
-  //     type: 'value',
-  //   }],
+  }, {
+    type: 'value',
+    name: '情绪指数',
+    max: 0.2,
+    axisLine: {
+      lineStyle: {
+        // color: colors[1]
+      }
+    },
+    splitLine: {
+      show: false
+    },
+    axisLabel: {
+      formatter: function (a) {
+        return a * 100 + ' %'
+      }
+    }
+  }],
   dataZoom: [
     {
       show: true,
@@ -111,10 +141,10 @@ function fetchData() {
 
       cap.forEach((c, i) => {
         const d = new Date(c[0])
-        retRatio.push({ name: d.toString(), value: [c[0], vol[i][1] / c[1] * Math.pow(10, 12)] })
+        retRatio.push({ name: d.toString(), value: [c[0], vol[i][1] / c[1]] })
         retCap.push({ name: d.toString(), value: [c[0], cap[i][1]] })
         retVol.push({ name: d.toString(), value: [c[0], vol[i][1]] })
-        retPrice.push({ name: d.toString(), value: [c[0], price[i][1] * Math.pow(10, 7)] })
+        retPrice.push({ name: d.toString(), value: [c[0], price[i][1]] })
       });
 
       // // 根据情绪指数，算出情绪占比
@@ -138,36 +168,38 @@ function fetchData() {
           type: 'line',
           name: '情绪指数',
           showSymbol: false,
+          yAxisIndex: 1,
           hoverAnimation: false,
           data: retRatio
         }, {
-        //   type: 'line',
-        //   name: '情绪占比',
-        //   showSymbol: false,
-        //   hoverAnimation: false,
-        //   data: retStack
-        // }, {
-          type: 'line',
-          name: '市场总量',
-          showSymbol: false,
-          hoverAnimation: false,
-          data: retCap
-        }, {
-          type: 'line',
-          name: '交易总量',
-          showSymbol: false,
-          hoverAnimation: false,
-          data: retVol
-        }, {
+          //   type: 'line',
+          //   name: '情绪占比',
+          //   showSymbol: false,
+          //   hoverAnimation: false,
+          //   data: retStack
+          // }, {
+          //   type: 'line',
+          //   name: '市场总量',
+          //   showSymbol: false,
+          //   hoverAnimation: false,
+          //   data: retCap
+          // }, {
+          //   type: 'line',
+          //   name: '交易总量',
+          //   showSymbol: false,
+          //   hoverAnimation: false,
+          //   data: retVol
+          // }, {
           type: 'line',
           name: '价格指数',
           showSymbol: false,
           hoverAnimation: false,
+          yAxisIndex: 0,
           data: retPrice
         }]
       });
 
-      setTimeout(fetchData, 30 * 60 * 1000);
+      setTimeout(fetchData, 1 * 60 * 1000);
     });
 }
 
