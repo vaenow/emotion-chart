@@ -119,7 +119,7 @@ fetchData()
 function fetchData() {
   const end = Date.now()
   const start = moment(end).subtract('month', 2).toDate().getTime()
-  $.getJSON(`http://172.20.150.63:3009/emotion?start=${start}&end=${end}/`)
+  $.getJSON(`https://api.hox.com/emotion?start=${start}&end=${end}/`)
     .then(({ data }) => {
       console.log(data)
 
