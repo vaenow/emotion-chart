@@ -9,7 +9,7 @@ module.exports = {
     'http://192.168.99.110:3010',
     'http://172.20.150.63:3010',
     'http://localhost:3010',
-    'https://api.hox.com',
+    'https://hox.com',
     WEB
   ],
 };
