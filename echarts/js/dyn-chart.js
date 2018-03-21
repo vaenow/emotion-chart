@@ -53,6 +53,7 @@ option = {
       ].join('<br/>')
     },
     axisPointer: {
+      type: 'cross',
       animation: false
     }
   },
@@ -199,7 +200,7 @@ function fetchData() {
         }]
       });
 
-      setTimeout(fetchData, 1 * 60 * 1000);
+      setTimeout(fetchData, 5 * 60 * 1000);
     });
 }
 
