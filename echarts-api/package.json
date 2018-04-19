@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "NODE_ENV=development supervisor bin/boot",
-    "dev": "NODE_ENV=development ./node_modules/.bin/nodemon bin/boot",
-    "prd": "pm2 start bin/boot",
+    "start": "NODE_ENV=development supervisor bin/boot.js",
+    "dev": "NODE_ENV=development ./node_modules/.bin/nodemon bin/boot.js",
+    "prd": "pm2 start bin/boot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

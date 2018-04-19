@@ -1,8 +1,8 @@
 const Response = require('../../utils/Response');
 const Request = require('../../utils/Request');
 
-const URL = `https://graphs2.coinmarketcap.com/global/marketcap-total/`
-const URL_BTC = `https://graphs2.coinmarketcap.com/currencies/bitcoin/`
+const URL = `https://graphs2.coinmarketcap.com/global/marketcap-total/`;
+const URL_BTC = `https://graphs2.coinmarketcap.com/currencies/bitcoin/`;
 /**
  * 验证用户
  */
