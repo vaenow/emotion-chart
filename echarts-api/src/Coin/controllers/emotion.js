@@ -3,6 +3,13 @@ const Request = require('../../utils/Request');
 
 const URL = `https://graphs2.coinmarketcap.com/global/marketcap-total/`;
 const URL_BTC = `https://graphs2.coinmarketcap.com/currencies/bitcoin/`;
+
+let dataCache = {
+  url: {
+    data: {},
+    time: 0
+  },
+}
 /**
  * 验证用户
  */
@@ -10,16 +17,34 @@ exports.getEmotion = async (ctx, next) => {
   let { start, end } = ctx.request.query;
 
   const url = URL_BTC + start + '/' + end + '/';
+
+  // 查询缓存
+  const now = Date.now()
+  const type = URL_BTC
+  if (!dataCache[type]) dataCache[type] = {}
+  if (now - dataCache[type].time < 5 * 60 * 1000) { // 5 min
+    // 使用缓存
+    const data = dataCache[type].data
+    return Response.success(ctx, {
+      ...data,
+      cached: true,
+    })
+  }
+
   const ret = await Request.get({}, url);
   const emotion_v1 = getEmotionV1(ret)
   const emotion_v2 = getEmotionV2(ret)
-
-  Response.success(ctx, {
-    // ...ret,
+  const data = {
     price_usd: ret.price_usd,
     emotion_v1,
     emotion_v2,
-  })
+  }
+
+  // 更新缓存
+  dataCache[type].data = data
+  dataCache[type].time = now
+
+  Response.success(ctx, dataCache[type].data)
 };
 
 /**
