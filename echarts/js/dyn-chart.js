@@ -23,7 +23,7 @@ var value = Math.random() * 1000;
 //   data.push(randomData());
 // }
 
-console.log(data)
+// console.log(data)
 
 function formateDate(date) {
   // return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear()
@@ -41,8 +41,6 @@ option = {
   tooltip: {
     trigger: 'axis',
     formatter: function (sd, date, c) {
-      // console.log(sd,date,c)
-      // sd.splice(1, 0, {});
       return [
         `时间：${formateDate(new Date(sd[0].value[0]))}`,
         `${sd[0].marker} ${sd[0].seriesName}：${(sd[0].value[1] * 100).toFixed(2)}%`,
@@ -88,7 +86,7 @@ option = {
   }, {
     type: 'value',
     name: '情绪指数',
-    max: 0.2,
+    max: 2,
     axisLine: {
       lineStyle: {
         // color: colors[1]
@@ -123,80 +121,30 @@ function fetchData() {
   $.getJSON(`https://api.hox.com/emotion?start=${start}&end=${end}/`)
     .then(({ data }) => {
       console.log(data)
-
-      const cap = data['market_cap_by_available_supply']
-      const vol = data['volume_usd']
-      const price = data['price_usd']
-      let ratio = [
-        [], // 时间
-        [], // 占比
-        [], // vol
-        []  // cap
-      ]
-
-      let retRatio = [];
-      let retStack = [];
-      let retCap = [];
-      let retVol = [];
-      let retPrice = [];
-
-      cap.forEach((c, i) => {
-        const d = new Date(c[0])
-        retRatio.push({ name: d.toString(), value: [c[0], vol[i][1] / c[1]] })
-        retCap.push({ name: d.toString(), value: [c[0], cap[i][1]] })
-        retVol.push({ name: d.toString(), value: [c[0], vol[i][1]] })
-        retPrice.push({ name: d.toString(), value: [c[0], price[i][1]] })
-      });
-
-      // // 根据情绪指数，算出情绪占比
-      // const maxRatioValue = _.maxBy(retRatio, (o) => o.value[1]).value[1];
-      // console.log('maxRatioValue', maxRatioValue);
-      // cap.forEach((c, i) => {
-      //   const d = new Date(c[0])
-      //   // console.log('retRatio[i].value / maxRatioValue', retRatio[i].value[1], maxRatioValue, retRatio[i].value[1] / maxRatioValue)
-      //   retStack.push({ name: d.toString(), value: [c[0], retRatio[i].value[1] / maxRatioValue * Math.pow(10, 12)] })
-      // });
-
+      const { emotion_v1, emotion_v2, price_usd } = data;
 
       myChart.setOption({
-        series: [{
-          // yAxisIndex: 1,
-          // lineStyle: {
-          //   normal: {
-          //     width: 1
-          //   }
-          // },
+        series: [/*{
+          type: 'line',
+          name: '情绪指数v1',
+          showSymbol: false,
+          yAxisIndex: 1,
+          hoverAnimation: false,
+          data: emotion_v1.map(mapToEchart)
+        }, */{
           type: 'line',
           name: '情绪指数',
           showSymbol: false,
           yAxisIndex: 1,
           hoverAnimation: false,
-          data: retRatio
+          data: emotion_v2.map(mapToEchart)
         }, {
-          //   type: 'line',
-          //   name: '情绪占比',
-          //   showSymbol: false,
-          //   hoverAnimation: false,
-          //   data: retStack
-          // }, {
-          //   type: 'line',
-          //   name: '市场总量',
-          //   showSymbol: false,
-          //   hoverAnimation: false,
-          //   data: retCap
-          // }, {
-          //   type: 'line',
-          //   name: '交易总量',
-          //   showSymbol: false,
-          //   hoverAnimation: false,
-          //   data: retVol
-          // }, {
           type: 'line',
           name: '价格指数',
           showSymbol: false,
           hoverAnimation: false,
           yAxisIndex: 0,
-          data: retPrice
+          data: price_usd.map(mapToEchart)
         }]
       });
 
@@ -204,6 +152,12 @@ function fetchData() {
     });
 }
 
+function mapToEchart(v, k) {
+  return {
+    name: new Date(v[0]).toString(),
+    value: [v[0], v[1]]
+  }
+}
 
 if (option && typeof option === "object") {
   myChart.setOption(option, true);
