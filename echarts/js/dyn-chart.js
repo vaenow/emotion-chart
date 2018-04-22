@@ -25,7 +25,7 @@ var value = Math.random() * 1000;
 
 // console.log(data)
 
-function formateDate(date) {
+function formatDate(date) {
   // return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear()
   return moment(date).format('YYYY-MM-DD HH:mm:ss')
 
@@ -42,7 +42,7 @@ option = {
     trigger: 'axis',
     formatter: function (sd, date, c) {
       return [
-        `时间：${formateDate(new Date(sd[0].value[0]))}`,
+        `时间：${formatDate(new Date(sd[0].value[0]))}`,
         `${sd[0].marker} ${sd[0].seriesName}：${(sd[0].value[1] * 100).toFixed(2)}%`,
         // `${sd[1].marker} ${sd[1].seriesName}：${(sd[1].value[1] * 100).toFixed(2)}%`,
         // `${sd[2].marker} ${sd[2].seriesName}：$${sd[2].value[1]}`,
@@ -53,6 +53,30 @@ option = {
     axisPointer: {
       type: 'cross',
       animation: false
+    }
+  },
+  toolbox:{
+    feature :{
+      dataView: {
+        show:true,
+        optionToContent: function(opt) {
+          var series = opt.series;
+          var table = '<table style="text-align:center"><tbody><tr>'
+            + '<td>时间</td>'
+            + '<td>' + series[0].name + '</td>'
+            + '<td>' + series[1].name + '</td>'
+            + '</tr>';
+          for (var i = series[0].data.length - 1; i >= 0; i--) {
+            table += '<tr>'
+              + '<td>' + formatDate(series[0].data[i].value[0]) + '</td>'
+              + '<td>' + series[0].data[i].value[1].toFixed(5) + '</td>'
+              + '<td>' + series[1].data[i].value[1].toFixed(1) + '</td>'
+              + '</tr>';
+          }
+          table += '</tbody></table>';
+          return table;
+        }
+      }
     }
   },
   xAxis: {
@@ -120,7 +144,8 @@ function fetchData() {
   const start = moment(end).subtract('month', 2).toDate().getTime()
   $.getJSON(`https://api.hox.com/emotion?start=${start}&end=${end}/`)
     .then(({ data }) => {
-      console.log(data)
+      // console.log(data)
+      window.temp1 = data
       const { emotion_v1, emotion_v2, price_usd } = data;
 
       myChart.setOption({
