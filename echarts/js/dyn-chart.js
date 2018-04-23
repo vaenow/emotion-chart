@@ -43,11 +43,8 @@ option = {
     formatter: function (sd, date, c) {
       return [
         `时间：${formatDate(new Date(sd[0].value[0]))}`,
-        `${sd[0].marker} ${sd[0].seriesName}：${(sd[0].value[1] * 100).toFixed(2)}%`,
-        // `${sd[1].marker} ${sd[1].seriesName}：${(sd[1].value[1] * 100).toFixed(2)}%`,
-        // `${sd[2].marker} ${sd[2].seriesName}：$${sd[2].value[1]}`,
-        // `${sd[3].marker} ${sd[3].seriesName}：$${sd[3].value[1]}`,
-        `${sd[1].marker} ${sd[1].seriesName}：$${sd[1].value[1]}`
+        `${sd[1].marker} ${sd[1].seriesName}：${(sd[1].value[1] * 100).toFixed(2)}%`,
+        // `${sd[0].marker} ${sd[0].seriesName}：$${sd[0].value[1]}`
       ].join('<br/>')
     },
     axisPointer: {
@@ -129,7 +126,8 @@ option = {
     {
       show: true,
       realtime: true,
-      start: 70,
+      // start: 70,
+      start: 0,
       end: 100,
     }
   ],
@@ -142,7 +140,8 @@ fetchData()
 function fetchData() {
   const end = Date.now()
   const start = moment(end).subtract('month', 2).toDate().getTime()
-  $.getJSON(`https://api.hox.com/emotion?start=${start}&end=${end}/`)
+  // $.getJSON(`https://api.hox.com/emotion?start=${start}&end=${end}/`)
+  $.getJSON(`http://localhost:3009/emotion?start=${start}&end=${end}/`)
     .then(({ data }) => {
       // console.log(data)
       window.temp1 = data
@@ -158,6 +157,13 @@ function fetchData() {
           data: emotion_v1.map(mapToEchart)
         }, */{
           type: 'line',
+          name: '价格指数',
+          showSymbol: false,
+          hoverAnimation: false,
+          yAxisIndex: 0,
+          data: price_usd.map(mapToEchart)
+        }, {
+          type: 'line',
           name: '情绪指数',
           showSymbol: false,
           yAxisIndex: 1,
@@ -165,11 +171,11 @@ function fetchData() {
           data: emotion_v2.map(mapToEchart)
         }, {
           type: 'line',
-          name: '价格指数',
+          name: '回测指数',
           showSymbol: false,
-          hoverAnimation: false,
           yAxisIndex: 0,
-          data: price_usd.map(mapToEchart)
+          hoverAnimation: false,
+          data: []
         }]
       });
 
